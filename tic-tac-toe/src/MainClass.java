@@ -95,14 +95,39 @@ public class MainClass {
         Random rn = new Random();
         int x = -1;
         int y = -1;
-
-        do {
-            x = rn.nextInt(MAP_SIZE);
-            y = rn.nextInt(MAP_SIZE);
+        for (int i = 0; i < MAP_SIZE; i++) {
+            for (int j = 0; j < MAP_SIZE; j++) {
+                if (isCellEmpty(j, i)) {
+                    setDot(j, i, AI_DOT);
+                    if (checkWin(AI_DOT)) {
+                        return;
+                    }
+                    setDot(j, i, PUSTO);
+                }
+            }
         }
-        while (!isCellEmpty(y, x));
+        if (x == -1 && y == -1) {
+            for (int i = 0; i < MAP_SIZE; i++) {
+                for (int j = 0; j < MAP_SIZE; j++) {
+                    if (isCellEmpty(j,i)) {
+                        setDot(j, i, HUMAN_DOT);
+                        if (checkWin(HUMAN_DOT)) {
+                            x = j;
+                            y = i;
+                        }
+                        setDot(j,i,PUSTO);
+                    }
+                }
+            }
+        }
+        if (x == -1 && y == -1) {
+            do {
+                x = rn.nextInt(MAP_SIZE);
+                y = rn.nextInt(MAP_SIZE);
+            }
+            while (!isCellEmpty(y, x));
+        }
         setDot(y, x, AI_DOT);
-
     }
 
     //проверка осталось ли на поле хотя бы одна пустая ячейка
@@ -117,25 +142,14 @@ public class MainClass {
 
     //проверка победы
     public static boolean checkWin(char dot) {
-        //проверка строк и столбцов
         for (int i = 0; i < MAP_SIZE; i++) {
             for (int j = 0; j < MAP_SIZE; j++) {
-                if (checkLine(i, 0, 0, 1, VICTORY_CONDITIONS, dot)) return true;
-                if (checkLine(0, i, 1, 0, VICTORY_CONDITIONS, dot)) return true;
-            }
-        }
-
-        //проверка главной диагонали
-        for (int i = 0; i < MAP_SIZE / 2; i++) {
-            for (int j = 0; j < MAP_SIZE / 2; j++) {
-                if (checkLine(i, j, 1, 1, VICTORY_CONDITIONS, dot)) return true;
-            }
-        }
-
-        //роверка побочной диагонали
-        for (int i = 0; i < MAP_SIZE / 2; i++) {
-            for (int j = MAP_SIZE - 1; j > MAP_SIZE / 2; j--) {
-                if (checkLine(i, j, 1, -1, VICTORY_CONDITIONS, dot)) return true;
+                if (checkLine(i, j, 1, 0, VICTORY_CONDITIONS, dot)
+                        || checkLine(i, j, 0, 1, VICTORY_CONDITIONS, dot)
+                        || checkLine(i, j, 1, 1, VICTORY_CONDITIONS, dot)
+                        || checkLine(i, j, 1, -1, VICTORY_CONDITIONS, dot)) {
+                    return true;
+                }
             }
         }
         return false;
